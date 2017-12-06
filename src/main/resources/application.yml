@@ -1,0 +1,41 @@
+spring:
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    platform: h2
+  h2:
+    console:
+      enabled: true
+      path: /console
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+liquibase:
+    changeLog: classpath:db.changelog/db.changelog-master.xml
+    contexts: dev
+
+extjsdemo:
+  version: 0.0.1
+  oauthClient:
+    clientId: web
+    resourceIds: API
+    secretRequired: false
+    clientSecret: Aq!2ws
+    scoped: true
+    scope: api
+    authorities:
+    accessTokenValiditySeconds: -1
+    refreshTokenValiditySeconds: 5400
+    authorizedGrantTypes: refresh_token,implicit,authorization_code,password
+  swagger:
+    enabled: true
+    contact:
+      name: Semyon
+      url: https://github.com/semyonmi
+      email: semyon.mi@yandex.ru

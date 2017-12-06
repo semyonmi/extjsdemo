@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="init schema" author="semyon">
+        <createSequence cycle="false"
+                        incrementBy="1"
+                        ordered="true"
+                        sequenceName="sys_main_sq"
+                        startValue="51"/>
+        <createTable tableName="sys_role" remarks="Role of user">
+            <column name="id" type="bigint" autoIncrement="true" startWith="2" remarks="Identificator">
+                <constraints primaryKeyName="sys_role_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ident" type="varchar(50)" remarks="Ident of role">
+                <constraints uniqueConstraintName="sys_role_ident_udx" unique="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)" remarks="Name of role">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="sys_user" remarks="Users">
+            <column name="id" type="bigint" autoIncrement="true" startWith="2" remarks="Identificator">
+                <constraints primaryKeyName="sys_user_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="login" type="varchar(50)" remarks="User name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="varchar(250)" remarks="First name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar(250)" remarks="A surname">
+                <constraints nullable="true"/>
+            </column>
+            <column name="password" type="varchar(150)" remarks="Password hash">
+                <constraints nullable="false"/>
+            </column>
+            <column name="locked" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="bigint" remarks="User identificator">
+                <constraints foreignKeyName="sys_user_role_id_fk"
+                             referencedTableName="sys_role" referencedColumnNames="id"
+                             nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="sys_user" indexName="sys_user_role_id_idx">
+            <column name="role_id" type="bigint"/>
+        </createIndex>
+        <createTable tableName="sys_access" remarks="Access">
+            <column name="user_id" type="bigint" autoIncrement="true" remarks="User identificator">
+                <constraints primaryKeyName="sys_access_pk" primaryKey="true"
+                             foreignKeyName="sys_access_user_id_fk"
+                             referencedTableName="sys_user" referencedColumnNames="id"
+                             nullable="false"/>
+            </column>
+            <column name="mask" type="int" remarks="Bit mask. 0-non access 1-read access 2-write access">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="sys_access" indexName="sys_access_user_id_idx">
+            <column name="user_id" type="bigint"/>
+        </createIndex>
+
+        <insert dbms="h2" tableName="sys_role">
+            <column name="id" type="bigint" valueNumeric="1" autoIncrement="false"/>
+            <column name="ident" type="varchar(50)" value="ADMIN"/>
+            <column name="name" type="varchar(50)" value="Администратор"/>
+        </insert>
+        <insert dbms="h2" tableName="sys_role">
+            <column name="ident" type="varchar(50)" value="USER"/>
+            <column name="name" type="varchar(50)" value="Пользователь"/>
+        </insert>
+        <insert dbms="h2" tableName="sys_role">
+            <column name="ident" type="varchar(50)" value="QUEST"/>
+            <column name="name" type="varchar(50)" value="Гость"/>
+        </insert>
+        <insert dbms="h2" tableName="sys_user">
+            <column name="id" valueNumeric="1" autoIncrement="false"/>
+            <column name="login" type="varchar(50)" value="ADMIN"/>
+            <column name="first_name" value="Администратор"/>
+            <column name="password" type="varchar(150)" value="$2a$10$6vE1OCOk33zlK47D4Xtcue3j1Fejh87GjbZ7JfCvfqAlFbYlrzxoi"/>
+            <column name="locked" type="boolean" valueBoolean="false"/>
+            <column name="role_id" type="bigint" valueNumeric="1"/>
+        </insert>
+        <insert dbms="h2" tableName="sys_access">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="mask" valueNumeric="3"/>
+        </insert>
+        
+        <createTable tableName="ed_country" remarks="Country">
+            <column name="id" type="bigint" autoIncrement="true" startWith="5" remarks="Identificator">
+                <constraints primaryKeyName="ed_country_pk" primaryKey="true"
+                             nullable="false"/>
+            </column>
+            <column name="name" type="varchar(150)" remarks="Name of country">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <insert dbms="h2" tableName="ed_country">
+            <column name="id" valueNumeric="1" autoIncrement="false"/>
+            <column name="name" type="varchar(50)" value="США"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_country">
+            <column name="id" valueNumeric="2" autoIncrement="false"/>
+            <column name="name" type="varchar(50)" value="Россия"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_country">
+            <column name="id" valueNumeric="3" autoIncrement="false"/>
+            <column name="name" type="varchar(50)" value="Германия"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_country">
+            <column name="id" valueNumeric="4" autoIncrement="false"/>
+            <column name="name" type="varchar(50)" value="Япония"/>
+        </insert>
+
+        <createTable tableName="ed_company" remarks="Country">
+            <column name="id" type="bigint" autoIncrement="true" startWith="10" remarks="Identificator">
+                <constraints primaryKeyName="ed_company_pk" primaryKey="true"
+                             nullable="false"/>
+            </column>
+            <column name="name" type="varchar(150)" remarks="Name of company">
+                <constraints nullable="false"/>
+            </column>
+            <column name="employees" type="int" remarks="Number of employees">
+                <constraints nullable="true"/>
+            </column>
+            <column name="country_id" type="bigint" remarks="Country">
+                <constraints foreignKeyName="ed_company_country_id_fk"
+                             referencedTableName="ed_country" referencedColumnNames="id"
+                             nullable="true"/>
+            </column>
+            <column name="parent_id" type="bigint" remarks="Parent company">
+                <constraints foreignKeyName="ed_company_parent_id_fk"
+                             referencedTableName="ed_company" referencedColumnNames="id"
+                             nullable="true"/>
+            </column>
+        </createTable>
+        <createIndex tableName="ed_company" indexName="ed_company_country_id_idx">
+            <column name="country_id" type="bigint"/>
+        </createIndex>
+        <createIndex tableName="ed_company" indexName="ed_company_parent_id_idx">
+            <column name="parent_id" type="bigint"/>
+        </createIndex>
+
+        <insert dbms="h2" tableName="ed_company">
+            <column name="id" valueNumeric="1" autoIncrement="false"/>
+            <column name="name" value="Alphabet Inc."/>
+            <column name="employees" valueNumeric="78801"/>
+            <column name="country_id" valueNumeric="1"/>
+            <column name="parent_id" valueNumeric="null"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_company">
+            <column name="id" valueNumeric="2" autoIncrement="false"/>
+            <column name="name" value="Google Inc."/>
+            <column name="employees" valueNumeric="73992"/>
+            <column name="country_id" valueNumeric="1"/>
+            <column name="parent_id" valueNumeric="1"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_company">
+            <column name="id" valueNumeric="3" autoIncrement="false"/>
+            <column name="name" value="Газпром"/>
+            <column name="employees" valueNumeric="459600"/>
+            <column name="country_id" valueNumeric="2"/>
+            <column name="parent_id" valueNumeric="null"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_company">
+            <column name="id" valueNumeric="4" autoIncrement="false"/>
+            <column name="name" value="Яндекс"/>
+            <column name="employees" valueNumeric="6271"/>
+            <column name="country_id" valueNumeric="2"/>
+            <column name="parent_id" valueNumeric="null"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_company">
+            <column name="id" valueNumeric="5" autoIncrement="false"/>
+            <column name="name" value="КиноПоиск"/>
+            <column name="employees" valueNumeric="null"/>
+            <column name="country_id" valueNumeric="2"/>
+            <column name="parent_id" valueNumeric="4"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_company">
+            <column name="id" valueNumeric="6" autoIncrement="false"/>
+            <column name="name" value="Mercedes-Benz"/>
+            <column name="employees" valueNumeric="139947"/>
+            <column name="country_id" valueNumeric="3"/>
+            <column name="parent_id" valueNumeric="null"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_company">
+            <column name="id" valueNumeric="7" autoIncrement="false"/>
+            <column name="name" value="Mercedes-AMG"/>
+            <column name="employees" valueNumeric="1400"/>
+            <column name="country_id" valueNumeric="3"/>
+            <column name="parent_id" valueNumeric="6"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_company">
+            <column name="id" valueNumeric="8" autoIncrement="false"/>
+            <column name="name" value="Sony Corporation"/>
+            <column name="employees" valueNumeric="125300"/>
+            <column name="country_id" valueNumeric="4"/>
+            <column name="parent_id" valueNumeric="null"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_company">
+            <column name="id" valueNumeric="9" autoIncrement="false"/>
+            <column name="name" value="Sony Pictures Entertainment"/>
+            <column name="employees" valueNumeric="null"/>
+            <column name="country_id" valueNumeric="4"/>
+            <column name="parent_id" valueNumeric="8"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_company">
+            <column name="id" valueNumeric="10" autoIncrement="false"/>
+            <column name="name" value="Sony Music Entertainment"/>
+            <column name="employees" valueNumeric="5000"/>
+            <column name="country_id" valueNumeric="4"/>
+            <column name="parent_id" valueNumeric="8"/>
+        </insert>
+        <insert dbms="h2" tableName="ed_company">
+            <column name="id" valueNumeric="11" autoIncrement="false"/>
+            <column name="name" value="Columbia Records"/>
+            <column name="employees" valueNumeric="null"/>
+            <column name="country_id" valueNumeric="4"/>
+            <column name="parent_id" valueNumeric="10"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
